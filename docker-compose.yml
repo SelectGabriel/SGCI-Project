@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: sgci-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sgci_users
+      MYSQL_USER: usuario
+      MYSQL_PASSWORD: senhaUsers
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./SGCI-Backend
+    container_name: sgci-backend
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sgci_users
+      SPRING_DATASOURCE_USERNAME: usuario
+      SPRING_DATASOURCE_PASSWORD: senhaUsers
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
+  frontend:
+    build: ./SGCI-Frontend
+    container_name: sgci-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql_data:
+
